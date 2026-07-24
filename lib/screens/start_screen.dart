@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
 import 'auth_screen.dart';
 
 class StartScreen extends StatelessWidget {
@@ -14,6 +13,8 @@ class StartScreen extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              Image.asset('assets/images/asimov.png', width: 250),
+              const SizedBox(height: 5),
               RichText(
                 text: TextSpan(
                   children: [
@@ -30,7 +31,7 @@ class StartScreen extends StatelessWidget {
                       style: GoogleFonts.inriaSans(
                         fontSize: 40,
                         fontWeight: FontWeight.bold,
-                        color: const Color.fromARGB(255, 0, 0, 0),
+                        color: Theme.of(context).textTheme.bodyLarge?.color,
                       ),
                     ),
                   ],
@@ -47,24 +48,7 @@ class StartScreen extends StatelessWidget {
                       MaterialPageRoute(builder: (context) => const AuthScreen()),
                     );
                   },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(255, 52, 71, 102),
-                    foregroundColor: const Color.fromARGB(255, 249, 252, 255),
-                    side: const BorderSide(
-                      color: Color.fromARGB(255, 145, 161, 187),
-                      width: 3.0,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                  ),
-                  child: Text(
-                    'COMEÇAR',
-                    style: GoogleFonts.inriaSans(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                  child: const Text('COMEÇAR', style: TextStyle(fontSize: 22)),
                 ),
               ),
             ],

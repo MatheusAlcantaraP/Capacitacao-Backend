@@ -16,7 +16,6 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
   var _isLogin = true;
   var _enteredEmail = '';
   var _enteredPassword = '';
-  var _enteredConfirmPassword = '';
   var _isAuthenticating = false;
 
   void _submit() async {
@@ -24,42 +23,25 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     if (!isValid) return;
 
     _formKey.currentState!.save();
-
     final auth = ref.read(firebaseAuthProvider);
 
     try {
-      setState(() {
-        _isAuthenticating = true;
-      });
+      setState(() => _isAuthenticating = true);
 
       if (_isLogin) {
-        await auth.signInWithEmailAndPassword(
-          email: _enteredEmail,
-          password: _enteredPassword,
-        );
+        await auth.signInWithEmailAndPassword(email: _enteredEmail, password: _enteredPassword);
       } else {
-        await auth.createUserWithEmailAndPassword(
-          email: _enteredEmail,
-          password: _enteredPassword,
-        );
+        await auth.createUserWithEmailAndPassword(email: _enteredEmail, password: _enteredPassword);
       }
-      if (mounted) {
-      Navigator.of(context).popUntil((route) => route.isFirst);
-    }
+
+      if (mounted) Navigator.of(context).popUntil((route) => route.isFirst);
     } on FirebaseException catch (error) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            error.message ?? 'Falha na autenticação.',
-            style: GoogleFonts.inriaSans(),
-          ),
-        ),
+        SnackBar(content: Text(error.message ?? 'Falha na autenticação.')),
       );
-      setState(() {
-        _isAuthenticating = false;
-      });
+      setState(() => _isAuthenticating = false);
     }
   }
 
@@ -90,7 +72,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                           style: GoogleFonts.inriaSans(
                             fontSize: 40,
                             fontWeight: FontWeight.bold,
-                            color: const Color.fromARGB(255, 0, 0, 0),
+                            color: Theme.of(context).textTheme.bodyLarge?.color,
                           ),
                         ),
                       ],
@@ -102,23 +84,12 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                     child: Column(
                       children: [
                         TextFormField(
-                          decoration: InputDecoration(
-                            labelText: 'E-mail',
-                            labelStyle: GoogleFonts.inriaSans(
-                                color: const Color.fromARGB(255, 52, 71, 102)),
-                            enabledBorder: const UnderlineInputBorder(
-                              borderSide: BorderSide(
-                                  color: Color.fromARGB(255, 145, 161, 187)),
-                            ),
-                          ),
-                          style: GoogleFonts.inriaSans(),
+                          decoration: const InputDecoration(labelText: 'E-mail'),
                           keyboardType: TextInputType.emailAddress,
                           autocorrect: false,
                           textCapitalization: TextCapitalization.none,
                           validator: (value) {
-                            if (value == null ||
-                                value.trim().isEmpty ||
-                                !value.contains('@')) {
+                            if (value == null || value.trim().isEmpty || !value.contains('@')) {
                               return 'Por favor, insira um e-mail válido.';
                             }
                             return null;
@@ -127,16 +98,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                         ),
                         const SizedBox(height: 16),
                         TextFormField(
-                          decoration: InputDecoration(
-                            labelText: 'Senha',
-                            labelStyle: GoogleFonts.inriaSans(
-                                color: const Color.fromARGB(255, 52, 71, 102)),
-                            enabledBorder: const UnderlineInputBorder(
-                              borderSide: BorderSide(
-                                  color: Color.fromARGB(255, 145, 161, 187)),
-                            ),
-                          ),
-                          style: GoogleFonts.inriaSans(),
+                          decoration: const InputDecoration(labelText: 'Senha'),
                           obscureText: true,
                           validator: (value) {
                             if (value == null || value.trim().length < 6) {
@@ -146,81 +108,24 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                           },
                           onSaved: (value) => _enteredPassword = value!,
                         ),
-                        
-                        if (!_isLogin) ...[
-                          const SizedBox(height: 16),
-                          TextFormField(
-                            decoration: InputDecoration(
-                              labelText: 'Confirmar Senha',
-                              labelStyle: GoogleFonts.inriaSans(
-                                  color:
-                                      const Color.fromARGB(255, 52, 71, 102)),
-                              enabledBorder: const UnderlineInputBorder(
-                                borderSide: BorderSide(
-                                    color: Color.fromARGB(255, 145, 161, 187)),
-                              ),
-                            ),
-                            style: GoogleFonts.inriaSans(),
-                            obscureText: true,
-                            validator: (value) {
-                              if (value != _enteredPassword) {
-                                return 'As senhas não coincidem.';
-                              }
-                              return null;
-                            },
-                            onSaved: (value) =>
-                                _enteredConfirmPassword = value!,
-                          ),
-                        ],
                         const SizedBox(height: 40),
                         if (_isAuthenticating)
-                          const CircularProgressIndicator(
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                                Color.fromARGB(255, 52, 71, 102)),
-                          )
+                          const CircularProgressIndicator()
                         else ...[
                           SizedBox(
                             width: 160,
                             height: 55,
                             child: ElevatedButton(
                               onPressed: _submit,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor:
-                                    const Color.fromARGB(255, 52, 71, 102),
-                                foregroundColor: const Color.fromARGB(255, 249, 252, 255),
-                                side: const BorderSide(
-                                  color: Color.fromARGB(255, 145, 161, 187),
-                                  width: 3.0,
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                ),
-                              ),
-                              child: Text(
-                                _isLogin ? 'ENTRAR' : 'CADASTRAR',
-                                style: GoogleFonts.inriaSans(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
+                              child: Text(_isLogin ? 'ENTRAR' : 'CADASTRAR', style: const TextStyle(fontSize: 20)),
                             ),
                           ),
                           const SizedBox(height: 16),
                           TextButton(
-                            onPressed: () {
-                              setState(() {
-                                _isLogin = !_isLogin;
-                              });
-                            },
+                            onPressed: () => setState(() => _isLogin = !_isLogin),
                             child: Text(
-                              _isLogin
-                                  ? 'Criar uma conta'
-                                  : 'Já possuo uma conta',
-                              style: GoogleFonts.inriaSans(
-                                color: const Color.fromARGB(255, 52, 71, 102),
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                              ),
+                              _isLogin ? 'Criar uma conta' : 'Já possuo uma conta',
+                              style: GoogleFonts.inriaSans(fontWeight: FontWeight.bold, fontSize: 16, color: Color.fromARGB(255, 249, 252, 255)),
                             ),
                           ),
                         ],
